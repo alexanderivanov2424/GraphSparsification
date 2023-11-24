@@ -1,0 +1,115 @@
+import numpy as np
+import networkx as nx
+
+from constants import getConstObj
+
+"""
+Graph Sparsification by Effective Resistances
+Daniel A. Spielman, Nikhil Srivastava
+https://arxiv.org/abs/0803.0929
+
+EffRes_Pinv() implements the algorithm in section 1.1, computing effective resistances directly from Moore-Penrose Pseudoinverse
+"""
+
+
+def EffRes_SampleCount(n, eps):
+  C = getConstObj().EffRes_C
+  return int(9.0 * C * C * n * np.log(n) / (eps * eps))
+
+# Compute effective resistances directly from Moore-Penrose Pseudoinverse
+def EffRes_Pinv(G, eps):
+  
+  n = G.number_of_nodes()
+  q = EffRes_SampleCount(n, eps)
+
+  L = nx.laplacian_matrix(G).toarray()
+  L_pinv = np.linalg.pinv(L)
+
+  weights = []
+
+  for edge in G.edges(data=True):
+    X = np.zeros((n, 1))
+    X[edge[0]] = 1
+    X[edge[1]] = -1
+    r = (X.T @ L_pinv @ X)[0,0]
+    w = edge[2]["weight"] if "weight" in edge[2] else 1.0
+    weights.append(r * w)
+
+  weights = np.array(weights)
+  weights = weights / np.sum(weights)
+
+  samples = np.random.choice(range(len(weights)), q, p=weights) 
+
+  H = nx.Graph()
+  H.add_nodes_from(G.nodes)
+
+  # TODO optimize by taking counts on samples
+  edges = list(G.edges(data=True))
+  for sample in samples:
+    edge = edges[sample]
+    w = edge[2]["weight"]/(q * weights[sample])
+
+    if H.has_edge(edge[0], edge[1]):
+      H[edge[0]][edge[1]]["weight"] += w
+    else:
+      H.add_edge(edge[0], edge[1], weight=w)
+
+  return H
+
+# estimation of L_pinv as described in theorem 8. solver can be an arbirary SDD solver L * x = y
+def ComputeREstimate(G, SDDSolver, eps):
+  n = G.number_of_nodes()
+  m = G.number_of_edges()
+  k = int(24 * np.log(n) / (eps * eps))
+
+  Q = np.random.randint(0, 2, (k, m)) * 2.0 - 1.0
+  Q /= np.sqrt(float(k))
+  W = np.diag([e[2]["weight"] for e in G.edges(data=True)])
+  B = nx.incidence_matrix(G, oriented=True, weight="weight").toarray().T
+
+  Y = np.matmul(Q, np.matmul(W, B))
+  
+  solver = SDDSolver(G, eps)
+  Z = []
+  for y in Y:
+    Z.append(solver.solve(y))
+  
+  return np.array(Z)
+
+# Estimate effective resistances using provided solver
+def EffRes_SDDSolver(G, SDDSolver, eps):
+  n = G.number_of_nodes()
+  q = EffRes_SampleCount(n, eps)
+
+  Z = ComputeREstimate(G, SDDSolver, eps)
+
+  weights = []
+
+  for edge in G.edges(data=True):
+    X = np.zeros((n, 1))
+    X[edge[0]] = 1
+    X[edge[1]] = -1
+    r = np.sum(np.square(Z @ X))
+    w = edge[2]["weight"] if "weight" in edge[2] else 1.0
+    weights.append(r * w)
+
+  weights = np.array(weights)
+  weights = weights / np.sum(weights)
+
+  samples = np.random.choice(range(len(weights)), q, p=weights) 
+
+  H = nx.Graph()
+  H.add_nodes_from(G.nodes)
+
+  # TODO optimize by taking counts on samples
+  edges = list(G.edges(data=True))
+  for sample in samples:
+    edge = edges[sample]
+    w = edge[2]["weight"]/(q * weights[sample])
+
+    if H.has_edge(edge[0], edge[1]):
+      H[edge[0]][edge[1]]["weight"] += w
+    else:
+      H.add_edge(edge[0], edge[1], weight=w)
+
+  return H
