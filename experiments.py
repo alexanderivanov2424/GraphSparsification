@@ -2,15 +2,42 @@ import numpy as np
 import time
 import networkx as nx
 
-from utils import save
+from utils import save, load, exists
 from evaluators import *
 
-def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
+
+def fix_keys(experiment_data):
+  for name in experiment_data:
+    fixed = {}
+    for key in experiment_data[name]:
+      try:
+        fixed[int(key)] = experiment_data[name][key]
+      except:
+        fixed[float(key)] = experiment_data[name][key]
+    experiment_data[name] = fixed
+
+def parse_experiment_data(experiment_data):
   X = []
   Y_methods = {}
+  for name in experiment_data.keys():
+    data = experiment_data[name]
+    for x in data.keys():
+      X.append(x)
+  X.sort()
+  for name in experiment_data.keys():
+    Y_methods[name] = [experiment_data[name][x] for x in X]
+  return X, Y_methods
 
+def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
+  experiment_data = {} # { method -> { x -> y } }
+  
+  if exists(exp_name):
+    experiment_data = load(exp_name)
+    fix_keys(experiment_data)
+  
   for name in names:
-    Y_methods[name] = []
+    if not name in experiment_data:
+      experiment_data[name] = {}
 
   print(exp_name)
   TOTAL_RUNS = len(sizes) * len(methods)
@@ -18,17 +45,17 @@ def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
 
   for n in sizes:
     G = graph_generator(n)
-    X.append(n)
 
     for i, method in enumerate(methods):
-      t, _ = time_method(method, (G, eps))
-      Y_methods[names[i]].append(t)
-
       RUN_COUNT+=1
-      print(f"{RUN_COUNT}/{TOTAL_RUNS}", end="\r")
+      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}", end="\r")
 
-  experiment = {"X" : X, "Y": Y_methods}
-  save(experiment, exp_name)
+      if n in experiment_data.get(names[i], {}):
+        continue
+      t, _ = time_method(method, (G, eps))
+      experiment_data[names[i]][n] = t
+
+      save(experiment_data, exp_name)
 
 
 def time_method(method, inputs):
@@ -52,11 +79,15 @@ def condition_number_comparison(exp_name, names, methods, graph_generator, sizes
   generic_comparison(relativeConditionNumberBound, exp_name, names, methods, graph_generator, sizes, eps)
 
 def generic_comparison(eval_func, exp_name, names, methods, graph_generator, sizes, eps):
-  X = []
-  Y_methods = {}
-
+  experiment_data = {} # { method -> { x -> y } }
+  
+  if exists(exp_name):
+    experiment_data = load(exp_name)
+    fix_keys(experiment_data)
+  
   for name in names:
-    Y_methods[name] = []
+    if not name in experiment_data:
+      experiment_data[name] = {}
 
   print(exp_name)
   TOTAL_RUNS = len(sizes) * len(methods)
@@ -64,15 +95,15 @@ def generic_comparison(eval_func, exp_name, names, methods, graph_generator, siz
 
   for n in sizes:
     G = graph_generator(n)
-    X.append(n)
-
+    
     for i, method in enumerate(methods):
+      RUN_COUNT+=1
+      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}", end="\r")
+
+      if n in experiment_data.get(names[i], {}):
+        continue
       H = method(G, eps)
       val = eval_func(G, H)
-      Y_methods[names[i]].append(val)
+      experiment_data[names[i]][n] = val
 
-      RUN_COUNT+=1
-      print(f"{RUN_COUNT}/{TOTAL_RUNS}", end="\r")
-
-  experiment = {"X" : X, "Y": Y_methods}
-  save(experiment, exp_name)
+      save(experiment_data, exp_name)

@@ -12,7 +12,7 @@ from Sparsifiers.quantized_random import *
 from Sparsifiers.trace_reduction import TraceRed_Sparsify
 
 
-from experiments import condition_number_comparison
+from experiments import condition_number_comparison, parse_experiment_data
 
 from constants import getConstObj
 from methods_map import getMethodsMap
@@ -25,18 +25,17 @@ names = ["RQS", "MM", "TR", "EFI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
-sizes = [50, 70, 100, 200, 300, 500, 700, 1000]
+sizes = [50, 70, 100, 200, 300, 400, 500]
 
 graph_gen_density = lambda p : get_random_weighted_graph(300, p)
-p_values = [.05, .1, .15, .2, .25, .3, .4, .5, .6, .7, .8, .9]
+p_values = [.05, .1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
 
 
 EXP_NAME = "condNum_comparison_size"
 condition_number_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
 
 exp = load(EXP_NAME)
-X = exp["X"]
-Y_methods = exp["Y"]
+X, Y_methods = parse_experiment_data(exp)
 for name in Y_methods.keys():
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))

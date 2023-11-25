@@ -61,17 +61,24 @@ eps = getConstObj().epsilon
 
 # exit()
 
-G = get_random_weighted_graph(50)
-H = TraceRed_Sparsify(G, eps)
-r = evaluate_spectral(G, H, eps)
+# G = get_random_weighted_graph(50)
+# H = TraceRed_Sparsify(G, eps)
+# r = evaluate_spectral(G, H, eps)
 
-print(r)
-exit()
+# print(r)
+# exit()
 
 
 
-G = get_random_weighted_graph(50, .5)
-H = EffRes_SDDSolver(G, SpanTree_Solver, eps)
-# H = EffRes_Pinv(G, eps)
-r = evaluate_spectral(G, H, eps)
-print(r)
+# G = get_random_weighted_graph(50, .5)
+# H = EffRes_SDDSolver(G, SpanTree_Solver, eps)
+# # H = EffRes_Pinv(G, eps)
+# r = evaluate_spectral(G, H, eps)
+# print(r)
+
+
+X = [1,4,5,2]
+Y = [10,14,15,11]
+
+plt.plot(X,Y)
+plt.show()

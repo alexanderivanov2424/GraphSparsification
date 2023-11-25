@@ -25,7 +25,7 @@ names = ["ST", "RQS", "MM", "TR", "EFI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
-sizes = [50, 70, 100, 200, 300, 500, 700, 1000]
+sizes = [50, 70, 100, 200, 300, 500]
 
 graph_gen_density = lambda p : get_random_weighted_graph(300, p)
 p_values = [.05, .1, .15, .2, .25, .3, .4, .5, .6, .7, .8, .9]
