@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def set_graph_weights_to_one(G):
   for edge in G.edges:
-    G[edge[0]][edge[1]]['weight'] = 1
+    G[edge[0]][edge[1]]['weight'] = 1.0
 
 def get_barbel_graph():
   G = nx.barbell_graph(30, 1)

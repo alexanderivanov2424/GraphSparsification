@@ -48,7 +48,7 @@ def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
 
     for i, method in enumerate(methods):
       RUN_COUNT+=1
-      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}", end="\r")
+      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}" + " "*10, end="\r")
 
       if n in experiment_data.get(names[i], {}):
         continue
@@ -68,6 +68,12 @@ def edge_reduction_comparison(exp_name, names, methods, graph_generator, sizes, 
 
 def spectral_error_comparison(exp_name, names, methods, graph_generator, sizes, eps):
   generic_comparison(average_error_spectral, exp_name, names, methods, graph_generator, sizes, eps)
+
+def spectral_error_ratio_comparison(exp_name, names, methods, graph_generator, sizes, eps):
+  generic_comparison(average_error_ratio_spectral, exp_name, names, methods, graph_generator, sizes, eps)
+
+def spectral_error_int_ratio_comparison(exp_name, names, methods, graph_generator, sizes, eps):
+  generic_comparison(average_error_int_ratio_spectral, exp_name, names, methods, graph_generator, sizes, eps)
 
 def adjacency_error_comparison(exp_name, names, methods, graph_generator, sizes, eps):
   generic_comparison(adjacency_L2, exp_name, names, methods, graph_generator, sizes, eps)
@@ -98,7 +104,7 @@ def generic_comparison(eval_func, exp_name, names, methods, graph_generator, siz
     
     for i, method in enumerate(methods):
       RUN_COUNT+=1
-      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}", end="\r")
+      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}" + " "*10, end="\r")
 
       if n in experiment_data.get(names[i], {}):
         continue

@@ -16,11 +16,12 @@ def randQuant_Sparsify(G, eps):
   n = G.number_of_nodes()
   A_ = np.zeros((n,n))
   r = eps / np.sqrt(n)
+  norm = np.sum(np.abs(A[A <= r]) / r)
   for i in range(n):
     for j in range(n):
       if A[i,j] > r:
         A_[i,j] = A[i,j]
-      elif np.random.rand() < np.abs(A[i,j]) / r:
+      elif np.random.rand() < np.abs(A[i,j]) / (r * norm):
         A_[i,j] = np.sign(A[i,j]) * r
   H = nx.from_numpy_matrix(A_)
   return H

@@ -11,11 +11,13 @@ from Sparsifiers.approximate_matrix_multiplication import *
 from Sparsifiers.quantized_random import *
 from Sparsifiers.trace_reduction import TraceRed_Sparsify
 
+from SDDSolvers.spanning_tree_PCG import SpanTree_Solver
 
-from experiments import condition_number_comparison, parse_experiment_data, fix_keys
+from experiments import spectral_error_int_ratio_comparison, parse_experiment_data, fix_keys
 
 from constants import getConstObj
 from methods_map import getMethodsMap
+
 
 eps = getConstObj().epsilon
 
@@ -24,15 +26,14 @@ methodsMapObj = getMethodsMap()
 names = ["RQS", "MM", "TR", "EFI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
-graph_gen_size = get_random_weighted_graph
+graph_gen_size = get_random_unweighted_graph
 sizes = [50, 70, 100, 200, 300, 400, 500]
 
-graph_gen_density = lambda p : get_random_weighted_graph(100, p)
+graph_gen_density = lambda p : get_random_unweighted_graph(100, p)
 p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
 
-
-EXP_NAME = "condNum_comparison_size"
-condition_number_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
+EXP_NAME = "spectral_error_unweighted_ratio_comparison_size"
+spectral_error_int_ratio_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
@@ -41,16 +42,16 @@ for name in Y_methods.keys():
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
-plt.title("Approximate Condition Number for Erdős-Rényi graphs of varying size")
+plt.title("L1 Spectral Error Ratio for Unweighted Erdős-Rényi graphs of varying size")
 plt.xlabel("Graph Size (nodes)")
-plt.ylabel("Approximate Condition Number")
+plt.ylabel("Average L1 Spectral Error Ratio")
 plt.legend()
 plt.savefig(f"./plots/{EXP_NAME}.png")
 plt.cla()
 
 
-EXP_NAME = "condNum_comparison_density"
-condition_number_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
+EXP_NAME = "spectral_error_unweighted_ratio_comparison_density"
+spectral_error_int_ratio_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
@@ -59,9 +60,9 @@ for name in Y_methods.keys():
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
-plt.title("Approximate Condition Number for Erdős-Rényi graphs of varying density")
+plt.title("L1 Spectral Error Ratio for Unweighted Erdős-Rényi graphs of varying density")
 plt.xlabel("Edge Probability (p)")
-plt.ylabel("Approximate Condition Number")
+plt.ylabel("Average L1 Spectral Error Ratio")
 plt.legend()
 plt.savefig(f"./plots/{EXP_NAME}.png")
 plt.cla()

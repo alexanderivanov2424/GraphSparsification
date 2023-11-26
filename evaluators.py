@@ -10,7 +10,6 @@ def evaluate_spectral(G, H, eps, num_tests = 100):
   B_G = get_sqrt_incidence(G)
   B_H = get_sqrt_incidence(H)
 
-  # TODO can be optimized further my multiplying by (n, num_tests) matrix for x
   for test in range(num_tests):
     x = np.random.rand(n)
 
@@ -27,7 +26,6 @@ def evaluate_spectral(G, H, eps, num_tests = 100):
 
 def average_error_spectral(G, H, num_tests = 100):
   n = G.number_of_nodes()
-  successful_test_count = 0
 
   #precomputing sqrt of weighted incidence matrix: sqrt(B)
   B_G = get_sqrt_incidence(G)
@@ -35,7 +33,6 @@ def average_error_spectral(G, H, num_tests = 100):
 
   errors = []
 
-  # TODO can be optimized further my multiplying by (n, num_tests) matrix for x
   for test in range(num_tests):
     x = np.random.rand(n)
 
@@ -43,6 +40,25 @@ def average_error_spectral(G, H, num_tests = 100):
     H_sum = spectral_sum_for_graph(B_H, x)
 
     errors.append(np.abs(G_sum - H_sum))
+
+  return np.mean(errors)
+
+def average_error_ratio_spectral(G, H, num_tests = 100):
+  n = G.number_of_nodes()
+
+  #precomputing sqrt of weighted incidence matrix: sqrt(B)
+  B_G = get_sqrt_incidence(G)
+  B_H = get_sqrt_incidence(H)
+
+  errors = []
+
+  for test in range(num_tests):
+    x = np.random.rand(n)
+
+    G_sum = spectral_sum_for_graph(B_G, x)
+    H_sum = spectral_sum_for_graph(B_H, x)
+
+    errors.append(H_sum/G_sum)
 
   return np.mean(errors)
 
@@ -54,7 +70,6 @@ def evaluate_spectral_int(G, H, eps):
   B_G = get_sqrt_incidence(G)
   B_H = get_sqrt_incidence(H)
 
-  # TODO can be optimized further my multiplying by (n, num_tests) matrix for x
   for i in range(n):
     x = np.zeros((n,1))
     x[i] = 1
@@ -69,6 +84,26 @@ def evaluate_spectral_int(G, H, eps):
        pass
 
   return successful_test_count/n
+
+def average_error_int_ratio_spectral(G, H):
+  n = G.number_of_nodes()
+
+  #precomputing sqrt of weighted incidence matrix: sqrt(B)
+  B_G = get_sqrt_incidence(G)
+  B_H = get_sqrt_incidence(H)
+
+  errors = []
+
+  for i in range(n):
+    x = np.zeros((n,1))
+    x[i] = 1
+
+    G_sum = spectral_sum_for_graph(B_G, x)
+    H_sum = spectral_sum_for_graph(B_H, x)
+
+    errors.append(H_sum/G_sum)
+
+  return np.mean(errors)
 
 def get_sqrt_incidence(G):
   B = nx.incidence_matrix(G, oriented=True, weight="weight").toarray().T

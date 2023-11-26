@@ -13,7 +13,7 @@ from Sparsifiers.trace_reduction import TraceRed_Sparsify
 
 from SDDSolvers.spanning_tree_PCG import SpanTree_Solver
 
-from experiments import spectral_error_comparison, parse_experiment_data
+from experiments import spectral_error_comparison, spectral_error_ratio_comparison, parse_experiment_data, fix_keys
 
 from constants import getConstObj
 from methods_map import getMethodsMap
@@ -29,17 +29,20 @@ methods = [methodsMapObj.getMethod(name) for name in names]
 graph_gen_size = get_random_weighted_graph
 sizes = [50, 70, 100, 200, 300, 400, 500]
 
-graph_gen_density = lambda p : get_random_weighted_graph(300, p)
-p_values = [.05, .1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
+graph_gen_density = lambda p : get_random_weighted_graph(100, p)
+p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
 
+
+
+names_effres = ["EFI", "EF"]
+methods_effres = [methodsMapObj.getMethod(name) for name in names_effres]
 
 
 EXP_NAME = "effRes_error_comparison_size"
-names_effres = ["EFI", "EF"]
-methods_effres = [methodsMapObj.getMethod(name) for name in names_effres]
 spectral_error_comparison(EXP_NAME, names_effres, methods_effres, graph_gen_size, sizes, eps)
 
 exp = load(EXP_NAME)
+fix_keys(exp)
 X, Y_methods = parse_experiment_data(exp)
 for name in Y_methods.keys():
   Y = Y_methods[name]
@@ -58,6 +61,7 @@ EXP_NAME = "effRes_error_comparison_density"
 spectral_error_comparison(EXP_NAME, names_effres, methods_effres, graph_gen_density, p_values, eps)
 
 exp = load(EXP_NAME)
+fix_keys(exp)
 X, Y_methods = parse_experiment_data(exp)
 for name in Y_methods.keys():
   Y = Y_methods[name]
@@ -71,6 +75,45 @@ plt.savefig(f"./plots/{EXP_NAME}.png")
 plt.cla()
 
 
+EXP_NAME = "effRes_error_ratio_comparison_size"
+spectral_error_ratio_comparison(EXP_NAME, names_effres, methods_effres, graph_gen_size, sizes, eps)
+
+exp = load(EXP_NAME)
+fix_keys(exp)
+X, Y_methods = parse_experiment_data(exp)
+for name in Y_methods.keys():
+  Y = Y_methods[name]
+  plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
+
+plt.title("L1 Spectral Error Ratio for Erdős-Rényi graphs of varying size")
+plt.xlabel("Graph Size (nodes)")
+plt.ylabel("Average L1 Spectral Error Ratio")
+plt.legend()
+plt.savefig(f"./plots/{EXP_NAME}.png")
+plt.cla()
+
+
+
+EXP_NAME = "effRes_error_ratio_comparison_density"
+spectral_error_ratio_comparison(EXP_NAME, names_effres, methods_effres, graph_gen_density, p_values, eps)
+
+exp = load(EXP_NAME)
+fix_keys(exp)
+X, Y_methods = parse_experiment_data(exp)
+for name in Y_methods.keys():
+  Y = Y_methods[name]
+  plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
+
+plt.title("L1 Spectral Error Ratio for Erdős-Rényi graphs of varying density")
+plt.xlabel("Edge Probability (p)")
+plt.ylabel("Average L1 Spectral Error Ratio")
+plt.legend()
+plt.savefig(f"./plots/{EXP_NAME}.png")
+plt.cla()
+
+
+
+
 
 
 
@@ -79,6 +122,7 @@ EXP_NAME = "spectral_error_comparison_size"
 spectral_error_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
 
 exp = load(EXP_NAME)
+fix_keys(exp)
 X, Y_methods = parse_experiment_data(exp)
 for name in Y_methods.keys():
   Y = Y_methods[name]
@@ -96,6 +140,7 @@ EXP_NAME = "spectral_error_comparison_density"
 spectral_error_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
 
 exp = load(EXP_NAME)
+fix_keys(exp)
 X, Y_methods = parse_experiment_data(exp)
 for name in Y_methods.keys():
   Y = Y_methods[name]
@@ -104,6 +149,42 @@ for name in Y_methods.keys():
 plt.title("L1 Spectral Error for Erdős-Rényi graphs of varying density")
 plt.xlabel("Edge Probability (p)")
 plt.ylabel("Average L1 Spectral Error")
+plt.legend()
+plt.savefig(f"./plots/{EXP_NAME}.png")
+plt.cla()
+
+
+EXP_NAME = "spectral_error_ratio_comparison_size"
+spectral_error_ratio_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
+
+exp = load(EXP_NAME)
+fix_keys(exp)
+X, Y_methods = parse_experiment_data(exp)
+for name in Y_methods.keys():
+  Y = Y_methods[name]
+  plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
+
+plt.title("L1 Spectral Error Ratio for Erdős-Rényi graphs of varying size")
+plt.xlabel("Graph Size (nodes)")
+plt.ylabel("Average L1 Spectral Error Ratio")
+plt.legend()
+plt.savefig(f"./plots/{EXP_NAME}.png")
+plt.cla()
+
+
+EXP_NAME = "spectral_error_ratio_comparison_density"
+spectral_error_ratio_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
+
+exp = load(EXP_NAME)
+fix_keys(exp)
+X, Y_methods = parse_experiment_data(exp)
+for name in Y_methods.keys():
+  Y = Y_methods[name]
+  plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
+
+plt.title("L1 Spectral Error Ratio for Erdős-Rényi graphs of varying density")
+plt.xlabel("Edge Probability (p)")
+plt.ylabel("Average L1 Spectral Error Ratio")
 plt.legend()
 plt.savefig(f"./plots/{EXP_NAME}.png")
 plt.cla()

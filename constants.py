@@ -7,7 +7,7 @@ class Constants:
     self.epsilon = .1 # accuracy bound for spectral sparcifier
 
 
-    self.EffRes_C = 1
+    self.EffRes_C = .05
 
     self.ApproxMatMult_delta = .1 # probability to NOT obtain epsilon close sparsification
 
