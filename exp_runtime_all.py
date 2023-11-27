@@ -23,11 +23,10 @@ names = ["ST", "RQS", "MM", "TR", "EFI", "EF"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
-sizes = [50, 70, 100, 200, 300, 400, 500]
+sizes = [50, 70, 100, 150, 200, 250, 300, 400]
 
 graph_gen_density = lambda p : get_random_weighted_graph(100, p)
-p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
-
+p_values = [.1, .15, .2, .25, .3, .4, .5, .6]
 
 
 EXP_NAME = "runtime_comparison_all_size"
@@ -71,8 +70,10 @@ plt.cla()
 
 
 
-names = ["ST", "RQS", "MM", "TR", "EFI"]
+names = ["ST", "RQS", "MM", "EFI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
+sizes = [50, 70, 100, 200, 300, 400, 500, 700, 1000]
+p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8, .9]
 
 EXP_NAME = "runtime_comparison_sub_size"
 runtime_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
