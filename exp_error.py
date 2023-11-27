@@ -9,11 +9,8 @@ from utils import load
 from Sparsifiers.effective_resistances import *
 from Sparsifiers.approximate_matrix_multiplication import *
 from Sparsifiers.quantized_random import *
-from Sparsifiers.trace_reduction import TraceRed_Sparsify
 
-from SDDSolvers.spanning_tree_PCG import SpanTree_Solver
-
-from experiments import spectral_error_comparison, spectral_error_ratio_comparison, parse_experiment_data, fix_keys
+from experiments import spectral_error_comparison, spectral_error_ratio_comparison, parse_experiment_data_mixed, fix_keys
 
 from constants import getConstObj
 from methods_map import getMethodsMap
@@ -27,10 +24,10 @@ names = ["RQS", "MM", "TR", "EFI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
-sizes = [50, 70, 100, 200, 300, 400, 500]
+sizes = [50, 70, 100, 200, 300, 400]#, 500]
 
 graph_gen_density = lambda p : get_random_weighted_graph(100, p)
-p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
+p_values = [.1, .15, .2, .25, .3, .4, .5, .6]#, .7, .8]
 
 
 
@@ -43,8 +40,9 @@ spectral_error_comparison(EXP_NAME, names_effres, methods_effres, graph_gen_size
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -62,8 +60,9 @@ spectral_error_comparison(EXP_NAME, names_effres, methods_effres, graph_gen_dens
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -80,8 +79,9 @@ spectral_error_ratio_comparison(EXP_NAME, names_effres, methods_effres, graph_ge
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -99,8 +99,9 @@ spectral_error_ratio_comparison(EXP_NAME, names_effres, methods_effres, graph_ge
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -123,8 +124,9 @@ spectral_error_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -141,8 +143,9 @@ spectral_error_comparison(EXP_NAME, names, methods, graph_gen_density, p_values,
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -159,8 +162,9 @@ spectral_error_ratio_comparison(EXP_NAME, names, methods, graph_gen_size, sizes,
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -177,8 +181,9 @@ spectral_error_ratio_comparison(EXP_NAME, names, methods, graph_gen_density, p_v
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 

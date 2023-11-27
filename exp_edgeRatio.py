@@ -9,10 +9,9 @@ from utils import load
 from Sparsifiers.effective_resistances import *
 from Sparsifiers.approximate_matrix_multiplication import *
 from Sparsifiers.quantized_random import *
-from Sparsifiers.trace_reduction import TraceRed_Sparsify
 
 
-from experiments import edge_reduction_comparison, parse_experiment_data, fix_keys
+from experiments import edge_reduction_comparison, parse_experiment_data_mixed, fix_keys
 
 from constants import getConstObj
 from methods_map import getMethodsMap
@@ -36,8 +35,9 @@ edge_reduction_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 
@@ -54,8 +54,9 @@ edge_reduction_comparison(EXP_NAME, names, methods, graph_gen_density, p_values,
 
 exp = load(EXP_NAME)
 fix_keys(exp)
-X, Y_methods = parse_experiment_data(exp)
+X_methods, Y_methods = parse_experiment_data_mixed(exp)
 for name in Y_methods.keys():
+  X = X_methods[name]
   Y = Y_methods[name]
   plt.plot(X, Y, label=methodsMapObj.getLabel(name), c=methodsMapObj.getColor(name))
 

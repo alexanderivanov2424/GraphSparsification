@@ -28,6 +28,17 @@ def parse_experiment_data(experiment_data):
     Y_methods[name] = [experiment_data[name][x] for x in X]
   return X, Y_methods
 
+def parse_experiment_data_mixed(experiment_data):
+  X_methods = {}
+  Y_methods = {}
+  for name in experiment_data.keys():
+    X_methods[name] = []
+    Y_methods[name] = []
+    for x in experiment_data[name].keys():
+      X_methods[name].append(x)
+      Y_methods[name].append(experiment_data[name][x])
+  return X_methods, Y_methods
+
 def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
   experiment_data = {} # { method -> { x -> y } }
   

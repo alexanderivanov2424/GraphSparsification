@@ -87,7 +87,7 @@ def getSortedOffSubgraphEdges(G, S, neighbourhoodMap, beta, delta):
     tTR = truncatedTraceReduction(p, q, G, Z, neighbourhoodMap[p], neighbourhoodMap[q])
     offSubgraphEdges.append((edge, tTR))
   
-  offSubgraphEdges.sort(key=lambda x: x[1])
+  offSubgraphEdges.sort(key=lambda x: -x[1])
   return offSubgraphEdges
 
 
