@@ -13,14 +13,12 @@ from Sparsifiers.quantized_random import *
 
 from experiments import edge_reduction_comparison, parse_experiment_data_mixed, fix_keys
 
-from constants import getConstObj
 from methods_map import getMethodsMap
 
-eps = getConstObj().epsilon
 
 methodsMapObj = getMethodsMap()
 
-names = ["ST", "RQS", "MM", "TR", "EFI"]
+names = ["ST", "RQS", "MM", "TR", "ERI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
@@ -31,7 +29,7 @@ p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
 
 
 EXP_NAME = "edgRatio_comparison_size"
-edge_reduction_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
+edge_reduction_comparison(EXP_NAME, names, methods, graph_gen_size, sizes)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
@@ -50,7 +48,7 @@ plt.cla()
 
 
 EXP_NAME = "edgRatio_comparison_density"
-edge_reduction_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
+edge_reduction_comparison(EXP_NAME, names, methods, graph_gen_density, p_values)
 
 exp = load(EXP_NAME)
 fix_keys(exp)

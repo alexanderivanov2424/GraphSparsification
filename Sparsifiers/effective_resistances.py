@@ -16,10 +16,17 @@ def EffRes_SampleCount(n, eps):
   C = getConstObj().EffRes_C
   return int(9.0 * C * C * n * np.log(n) / (eps * eps))
 
+def EffRes_Pinv_Fixed(G):
+  num_edges = int(G.number_of_edges() * getConstObj().edgeRatio)
+  return EffRes_Pinv_Base(G, num_edges, True)
+
+def EffRes_Pinv(G):
+  return EffRes_Pinv_Base(G)
+
 # Compute effective resistances directly from Moore-Penrose Pseudoinverse
-def EffRes_Pinv(G, eps):
-  
+def EffRes_Pinv_Base(G, q_max = 0, forceQ = False):
   n = G.number_of_nodes()
+  eps = getConstObj().epsilon
   q = EffRes_SampleCount(n, eps)
 
   L = nx.laplacian_matrix(G).toarray()
@@ -44,6 +51,7 @@ def EffRes_Pinv(G, eps):
   H.add_nodes_from(G.nodes)
 
   # TODO optimize by taking counts on samples
+  count = 0
   edges = list(G.edges(data=True))
   for sample in samples:
     edge = edges[sample]
@@ -53,6 +61,9 @@ def EffRes_Pinv(G, eps):
       H[edge[0]][edge[1]]["weight"] += w
     else:
       H.add_edge(edge[0], edge[1], weight=w)
+      count += 1
+    if forceQ and count >= q_max:
+      break
 
   return H
 
@@ -76,9 +87,17 @@ def ComputeREstimate(G, SDDSolver, eps):
   
   return np.array(Z)
 
+def EffRes_SDDSolver_Fixed(G, SDDSolver):
+  num_edges = int(G.number_of_edges() * getConstObj().edgeRatio)
+  return EffRes_SDDSolver_Base(G, SDDSolver, num_edges, True)
+
+def EffRes_SDDSolver(G, SDDSolver):
+  return EffRes_SDDSolver_Base(G, SDDSolver)
+
 # Estimate effective resistances using provided solver
-def EffRes_SDDSolver(G, SDDSolver, eps):
+def EffRes_SDDSolver_Base(G, SDDSolver, q_max = 0, forceQ = False):
   n = G.number_of_nodes()
+  eps = getConstObj().epsilon
   q = EffRes_SampleCount(n, eps)
 
   Z = ComputeREstimate(G, SDDSolver, eps)
@@ -102,6 +121,7 @@ def EffRes_SDDSolver(G, SDDSolver, eps):
   H.add_nodes_from(G.nodes)
 
   # TODO optimize by taking counts on samples
+  count = 0
   edges = list(G.edges(data=True))
   for sample in samples:
     edge = edges[sample]
@@ -111,5 +131,8 @@ def EffRes_SDDSolver(G, SDDSolver, eps):
       H[edge[0]][edge[1]]["weight"] += w
     else:
       H.add_edge(edge[0], edge[1], weight=w)
+      count += 1
+    if forceQ and count >= q_max:
+      break
 
   return H

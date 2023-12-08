@@ -1,7 +1,7 @@
-from Sparsifiers.effective_resistances import EffRes_Pinv, EffRes_SDDSolver
-from Sparsifiers.approximate_matrix_multiplication import ApproxMatMult
-from Sparsifiers.quantized_random import randQuant_Sparsify
-from Sparsifiers.trace_reduction import TraceRed_Sparsify
+from Sparsifiers.effective_resistances import EffRes_Pinv, EffRes_SDDSolver, EffRes_Pinv_Fixed, EffRes_SDDSolver_Fixed
+from Sparsifiers.approximate_matrix_multiplication import ApproxMatMult, ApproxMatMult_Fixed
+from Sparsifiers.quantized_random import randQuant_Sparsify, randQuant_Sparsify_Fixed
+from Sparsifiers.trace_reduction import TraceRed_Sparsify, TraceRed_Sparsify_Fixed
 from Sparsifiers.spanning_tree import spanTree_Sparsify
 
 from SDDSolvers.spanning_tree_PCG import SpanTree_Solver
@@ -16,15 +16,22 @@ class MethodObj:
 class MethodsMap:
   def __init__(self):
     self.methodsMap = {}
+    EffRes = lambda G : EffRes_SDDSolver(G, SpanTree_Solver)
 
-    EffRes = lambda G, eps : EffRes_SDDSolver(G, SpanTree_Solver, eps)
+    EffRes_Fixed = lambda G : EffRes_SDDSolver_Fixed(G, SpanTree_Solver)
 
     self.methodsMap["RQS"] = MethodObj(randQuant_Sparsify, "Random Quantized Sampling", 'tab:blue')
     self.methodsMap["MM"] = MethodObj(ApproxMatMult, "Matrix Multiplication", 'tab:orange')
     self.methodsMap["TR"] = MethodObj(TraceRed_Sparsify, "Trace Reduction", 'tab:green')
-    self.methodsMap["EFI"] = MethodObj(EffRes_Pinv, "Effective Resistances with Inverse", 'tab:red')
-    self.methodsMap["EF"] = MethodObj(EffRes, "Effective Resistances", 'tab:purple')
+    self.methodsMap["ERI"] = MethodObj(EffRes_Pinv, "Effective Resistances with Inverse", 'tab:red')
+    self.methodsMap["ER"] = MethodObj(EffRes, "Effective Resistances", 'tab:purple')
     self.methodsMap["ST"] = MethodObj(spanTree_Sparsify, "Maximum Spanning Tree", 'tab:brown')
+
+    self.methodsMap["F_RQS"] = MethodObj(randQuant_Sparsify_Fixed, "Random Quantized Sampling", 'tab:blue')
+    self.methodsMap["F_MM"] = MethodObj(ApproxMatMult_Fixed, "Matrix Multiplication", 'tab:orange')
+    self.methodsMap["F_TR"] = MethodObj(TraceRed_Sparsify_Fixed, "Trace Reduction", 'tab:green')
+    self.methodsMap["F_ERI"] = MethodObj(EffRes_Pinv_Fixed, "Effective Resistances with Inverse", 'tab:red')
+    self.methodsMap["F_ER"] = MethodObj(EffRes_Fixed, "Effective Resistances", 'tab:purple')
 
   def getMethod(self, code):
     return self.methodsMap[code].method

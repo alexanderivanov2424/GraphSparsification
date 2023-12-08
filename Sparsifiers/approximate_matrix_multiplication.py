@@ -11,7 +11,38 @@ https://arxiv.org/abs/2304.08581
 ApproxMatMult() implements Algorithm 2
 """
 
-def ApproxMatMult(G, eps):
+def ApproxMatMult_Fixed(G):
+  constants = getConstObj()
+  num_edges = G.number_of_edges() * constants.edgeRatio
+
+  B = nx.incidence_matrix(G, oriented=True, weight="weight").toarray().T
+  B = np.sqrt(np.abs(B)) * np.sign(B)
+
+  p = []
+  for edge in G.edges(data=True):
+    p.append(edge[2]["weight"])
+  p = np.array(p)
+  W = np.sum(p)
+  p /= W
+  
+  t = constants.epsilon * constants.ApproxMatMult_delta
+  r = int(1 / (t * t))
+  samples = np.random.choice(range(len(p)), r, p=p) 
+  
+  Incedence = nx.incidence_matrix(G, oriented=True).toarray().T
+
+  n = G.number_of_nodes()
+  L = np.zeros((n,n))
+
+  for i in samples:
+    L += np.outer(Incedence[i], Incedence[i]) * W / r
+    if np.count_nonzero(L) - n > 2 * num_edges:
+      break
+  
+  H = nx.from_numpy_matrix(np.diag(np.diagonal(L, 0)) - L)
+  return H
+
+def ApproxMatMult(G):
   B = nx.incidence_matrix(G, oriented=True, weight="weight").toarray().T
   B = np.sqrt(np.abs(B)) * np.sign(B)
 

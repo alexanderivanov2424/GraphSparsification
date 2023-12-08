@@ -10,6 +10,11 @@ def load(file_name):
     experiment = json.load(fp)
     return experiment
   
+def saveGraph(experiment, file_name):
+  pass
+
+def loadGraph(file_name):
+  pass
 
 def exists(file_name):
   return os.path.isfile(f"ExperimentData/{file_name}.json")

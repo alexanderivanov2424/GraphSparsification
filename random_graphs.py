@@ -14,6 +14,7 @@ def get_barbel_graph():
 def get_random_unweighted_graph(n, p = .1, seed = 0):
   G = nx.fast_gnp_random_graph(n, p, seed=seed)
   set_graph_weights_to_one(G)
+  connect_graph(G)
   return G
 
 def get_random_weighted_graph(n, p = .1, seed = 0):
@@ -21,6 +22,11 @@ def get_random_weighted_graph(n, p = .1, seed = 0):
   np.random.seed(seed)
   for edge in G.edges:
     G[edge[0]][edge[1]]['weight'] = np.random.rand()
+  connect_graph(G)
   return G
 
-
+def connect_graph(G):
+  comps = list(nx.connected_components(G))
+  root = list(comps[0])
+  for i in range(1, len(comps)):
+    G.add_edge(np.random.choice(root), np.random.choice(list(comps[i])))

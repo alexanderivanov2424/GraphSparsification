@@ -2,6 +2,11 @@ import numpy as np
 import time
 import networkx as nx
 
+from random_graphs import connect_graph
+
+import traceback
+import logging
+
 from utils import save, load, exists
 from evaluators import *
 
@@ -37,9 +42,14 @@ def parse_experiment_data_mixed(experiment_data):
     for x in experiment_data[name].keys():
       X_methods[name].append(x)
       Y_methods[name].append(experiment_data[name][x])
+    X_methods[name] = np.array(X_methods[name])
+    Y_methods[name] = np.array(Y_methods[name])
+    I = np.argsort(X_methods[name])
+    X_methods[name] = X_methods[name][I]
+    Y_methods[name] = Y_methods[name][I]
   return X_methods, Y_methods
 
-def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
+def runtime_comparison(exp_name, names, methods, graph_generator, sizes):
   experiment_data = {} # { method -> { x -> y } }
   
   if exists(exp_name):
@@ -63,7 +73,7 @@ def runtime_comparison(exp_name, names, methods, graph_generator, sizes, eps):
 
       if n in experiment_data.get(names[i], {}):
         continue
-      t, _ = time_method(method, (G, eps))
+      t, _ = time_method(method, (G,))
       experiment_data[names[i]][n] = t
 
       save(experiment_data, exp_name)
@@ -74,28 +84,28 @@ def time_method(method, inputs):
   val = method(*inputs)
   return (time.time() - t), val
 
-def edge_reduction_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(edgeReductionRatio, exp_name, names, methods, graph_generator, sizes, eps)
+def edge_reduction_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(edgeReductionRatio, exp_name, names, methods, graph_generator, sizes)
 
-def spectral_error_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(average_error_spectral, exp_name, names, methods, graph_generator, sizes, eps)
+def spectral_error_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(average_error_spectral, exp_name, names, methods, graph_generator, sizes)
 
-def spectral_error_ratio_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(average_error_ratio_spectral, exp_name, names, methods, graph_generator, sizes, eps)
+def spectral_error_ratio_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(average_error_ratio_spectral, exp_name, names, methods, graph_generator, sizes)
 
-def spectral_error_int_ratio_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(average_error_int_ratio_spectral, exp_name, names, methods, graph_generator, sizes, eps)
+def spectral_error_int_ratio_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(average_error_int_ratio_spectral, exp_name, names, methods, graph_generator, sizes)
 
-def adjacency_error_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(adjacency_L2, exp_name, names, methods, graph_generator, sizes, eps)
+def adjacency_error_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(adjacency_L2, exp_name, names, methods, graph_generator, sizes)
 
-def laplacian_error_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(laplacian_L2, exp_name, names, methods, graph_generator, sizes, eps)
+def laplacian_error_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(laplacian_L2, exp_name, names, methods, graph_generator, sizes)
 
-def condition_number_comparison(exp_name, names, methods, graph_generator, sizes, eps):
-  generic_comparison(relativeConditionNumberBound, exp_name, names, methods, graph_generator, sizes, eps)
+def condition_number_comparison(exp_name, names, methods, graph_generator, sizes):
+  generic_comparison(relativeConditionNumberBound, exp_name, names, methods, graph_generator, sizes)
 
-def generic_comparison(eval_func, exp_name, names, methods, graph_generator, sizes, eps):
+def generic_comparison(eval_func, exp_name, names, methods, graph_generator, sizes):
   experiment_data = {} # { method -> { x -> y } }
   
   if exists(exp_name):
@@ -119,8 +129,13 @@ def generic_comparison(eval_func, exp_name, names, methods, graph_generator, siz
 
       if n in experiment_data.get(names[i], {}):
         continue
-      H = method(G, eps)
-      val = eval_func(G, H)
-      experiment_data[names[i]][n] = val
+      H = method(G)
+      if not nx.is_connected(H):
+        connect_graph(H)
+      try:
+        val = eval_func(G, H)
+        experiment_data[names[i]][n] = val
 
-      save(experiment_data, exp_name)
+        save(experiment_data, exp_name)
+      except Exception as e:
+        logging.error(traceback.format_exc())

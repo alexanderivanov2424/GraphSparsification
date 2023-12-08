@@ -13,14 +13,11 @@ from Sparsifiers.quantized_random import *
 
 from experiments import condition_number_comparison, parse_experiment_data_mixed, fix_keys
 
-from constants import getConstObj
 from methods_map import getMethodsMap
-
-eps = getConstObj().epsilon
 
 methodsMapObj = getMethodsMap()
 
-names = ["RQS", "MM", "TR", "EFI"]
+names = ["RQS", "MM", "TR", "ERI"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
@@ -31,7 +28,7 @@ p_values = [.1, .15, .2, .25, .3, .4, .5, .6, .7, .8]
 
 
 EXP_NAME = "condNum_comparison_size"
-condition_number_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
+condition_number_comparison(EXP_NAME, names, methods, graph_gen_size, sizes)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
@@ -50,7 +47,7 @@ plt.cla()
 
 
 EXP_NAME = "condNum_comparison_density"
-condition_number_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
+condition_number_comparison(EXP_NAME, names, methods, graph_gen_density, p_values)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
@@ -71,7 +68,7 @@ plt.cla()
 graph_gen_size = get_random_unweighted_graph
 
 EXP_NAME = "condNum_comparison_unweighted_size"
-#condition_number_comparison(EXP_NAME, names, methods, graph_gen_size, sizes, eps)
+condition_number_comparison(EXP_NAME, names, methods, graph_gen_size, sizes)
 
 exp = load(EXP_NAME)
 fix_keys(exp)
@@ -90,7 +87,7 @@ plt.cla()
 
 
 EXP_NAME = "condNum_comparison_unweighted_density"
-condition_number_comparison(EXP_NAME, names, methods, graph_gen_density, p_values, eps)
+condition_number_comparison(EXP_NAME, names, methods, graph_gen_density, p_values)
 
 exp = load(EXP_NAME)
 fix_keys(exp)

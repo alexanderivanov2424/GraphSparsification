@@ -6,6 +6,8 @@ class Constants:
   def __init__(self):
     self.epsilon = .1 # accuracy bound for spectral sparcifier
 
+    self.edgeRatio = .5 # fraction of edges to keep after sparsification
+
 
     self.EffRes_C = .05
 
@@ -15,7 +17,7 @@ class Constants:
     self.TraceRed_Nr = 5 # number of edges to recover in each itteration
     self.TraceRed_delta = .1 # parameter delta for Sparse Approximate Inverse of the Cholesky Factor
     self.TraceRed_beta = 5 #size of neiborhood for trace reduction calculation
-    self.TraceRed_eps = .1 #epsilon bound for marking simlar edges
+    self.TraceRed_eps = .01 #epsilon bound for marking simlar edges
 
 ConstObj = Constants()
 

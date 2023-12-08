@@ -4,8 +4,4 @@
 compare values of C for effective res
 compare value of C across different graph sizes
 
-
-run time comp of effective res with solver versus direct compute of p_inv
-
-
-experiment unweighted for trace reduction
+compare constants for trace reduction

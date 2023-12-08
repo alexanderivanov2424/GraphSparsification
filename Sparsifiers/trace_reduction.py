@@ -1,5 +1,6 @@
 import numpy as np
 import networkx as nx
+from partial_cholesky_factorization import icholesky
 
 import heapq
 
@@ -13,7 +14,43 @@ https://arxiv.org/abs/2206.06223
 Implementing the main sparsification algorithm, algorithm 2, and the sparse approximate inverse of the Cholesky factor, algorithm 1
 """
 
-def TraceRed_Sparsify(G, eps):
+def TraceRed_Sparsify_Fixed(G):
+  m = G.number_of_edges()
+  num_edges = getConstObj().edgeRatio * m
+
+  Nr = getConstObj().TraceRed_Nr
+  num_iter = num_edges / Nr
+  delta = getConstObj().TraceRed_delta
+  beta = getConstObj().TraceRed_beta
+  eps_traceRed = getConstObj().TraceRed_eps
+
+  S = nx.maximum_spanning_tree(G, weight='weight', algorithm='kruskal')
+
+  edge_count = S.number_of_edges()
+  while edge_count < num_edges:
+    markedEdges = set()
+    neighbourhoodMap = buildNeighbourhoodMap(S, beta)
+    offSubgraphEdges = getSortedOffSubgraphEdges(G, S, neighbourhoodMap, beta, delta)
+    count = 0
+    k = 0
+    while count < num_iter and k < len(offSubgraphEdges):
+      edge, _ = offSubgraphEdges[k]
+      k += 1
+      edge_tuple = (edge[0], edge[1])
+      if not edge_tuple in markedEdges:
+        S.add_edge(edge[0], edge[1], weight=edge[2]["weight"])
+        markedEdges.add(edge_tuple)
+        count += 1
+        edge_count += 1
+        if edge_count >= num_edges:
+          break
+        for similar_edge in getSimilarEdges(edge[0], edge[1], S, neighbourhoodMap, beta, eps_traceRed):
+          markedEdges.add(similar_edge)
+
+  
+  return S
+
+def TraceRed_Sparsify(G):
   m = G.number_of_edges()
   alpha = getConstObj().TraceRed_alpha * m
   Nr = getConstObj().TraceRed_Nr
@@ -24,8 +61,8 @@ def TraceRed_Sparsify(G, eps):
 
   S = nx.maximum_spanning_tree(G, weight='weight', algorithm='kruskal')
 
-  markedEdges = set()
   for i in range(1, Nr + 1):
+    markedEdges = set()
     neighbourhoodMap = buildNeighbourhoodMap(S, beta)
     offSubgraphEdges = getSortedOffSubgraphEdges(G, S, neighbourhoodMap, beta, delta)
     count = 0
@@ -40,7 +77,7 @@ def TraceRed_Sparsify(G, eps):
         count += 1
         for similar_edge in getSimilarEdges(edge[0], edge[1], S, neighbourhoodMap, beta, eps_traceRed):
           markedEdges.add(similar_edge)
- 
+  
   return S
 
 def getSimilarEdges(p, q, G, neighbourhoodMap, beta, eps=.1):
@@ -76,7 +113,8 @@ def getSimilarEdges(p, q, G, neighbourhoodMap, beta, eps=.1):
 
 def getSortedOffSubgraphEdges(G, S, neighbourhoodMap, beta, delta):
   L = nx.laplacian_matrix(S).toarray()
-  Z = computeZApprox(L, delta)
+  Lfactor = icholesky(L)
+  Z = computeZApprox(Lfactor, delta)
 
   offSubgraphEdges = []
   for edge in G.edges(data=True):

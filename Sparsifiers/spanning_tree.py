@@ -7,5 +7,5 @@ Naive approach which returns just the maximum spanning tree
 """
 
 
-def spanTree_Sparsify(G, eps):
+def spanTree_Sparsify(G):
   return nx.maximum_spanning_tree(G, weight='weight', algorithm='kruskal')
