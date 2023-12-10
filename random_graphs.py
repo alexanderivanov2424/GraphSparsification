@@ -19,11 +19,16 @@ def get_random_unweighted_graph(n, p = .1, seed = 0):
 
 def get_random_weighted_graph(n, p = .1, seed = 0):
   G = nx.fast_gnp_random_graph(n, p, seed=seed)
+  G = set_random_weights(G, seed)
+  connect_graph(G)
+  return G
+
+def set_random_weights(G, seed = 0):
   np.random.seed(seed)
   for edge in G.edges:
     G[edge[0]][edge[1]]['weight'] = np.random.rand()
-  connect_graph(G)
   return G
+
 
 def connect_graph(G):
   comps = list(nx.connected_components(G))

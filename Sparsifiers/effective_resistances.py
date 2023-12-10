@@ -24,7 +24,7 @@ def EffRes_Pinv(G):
   return EffRes_Pinv_Base(G)
 
 # Compute effective resistances directly from Moore-Penrose Pseudoinverse
-def EffRes_Pinv_Base(G, q_max = 0, forceQ = False):
+def EffRes_Pinv_Base(G, num_edges = 0, forceEdges = False):
   n = G.number_of_nodes()
   eps = getConstObj().epsilon
   q = EffRes_SampleCount(n, eps)
@@ -45,25 +45,35 @@ def EffRes_Pinv_Base(G, q_max = 0, forceQ = False):
   weights = np.array(weights)
   weights = weights / np.sum(weights)
 
-  samples = np.random.choice(range(len(weights)), q, p=weights) 
-
   H = nx.Graph()
   H.add_nodes_from(G.nodes)
 
-  # TODO optimize by taking counts on samples
-  count = 0
   edges = list(G.edges(data=True))
-  for sample in samples:
-    edge = edges[sample]
-    w = edge[2]["weight"]/(q * weights[sample])
 
-    if H.has_edge(edge[0], edge[1]):
-      H[edge[0]][edge[1]]["weight"] += w
-    else:
-      H.add_edge(edge[0], edge[1], weight=w)
-      count += 1
-    if forceQ and count >= q_max:
+  num_samples = 0
+  while H.number_of_edges() < num_edges:
+    samples = np.random.choice(range(len(weights)), q, p=weights) 
+
+    for sample in samples:
+      edge = edges[sample]
+      w = edge[2]["weight"]/weights[sample]
+
+      if H.has_edge(edge[0], edge[1]):
+        H[edge[0]][edge[1]]["weight"] += w
+      else:
+        H.add_edge(edge[0], edge[1], weight=w)
+
+      num_samples += 1
+
+      if forceEdges and H.number_of_edges() >= num_edges:
+        break
+
+    if not forceEdges:
       break
+  
+  edges = list(H.edges(data=True))
+  for edge in edges:
+    H[edge[0]][edge[1]]["weight"] /= num_samples
 
   return H
 
@@ -95,7 +105,7 @@ def EffRes_SDDSolver(G, SDDSolver):
   return EffRes_SDDSolver_Base(G, SDDSolver)
 
 # Estimate effective resistances using provided solver
-def EffRes_SDDSolver_Base(G, SDDSolver, q_max = 0, forceQ = False):
+def EffRes_SDDSolver_Base(G, SDDSolver, num_edges = 0, forceEdges = False):
   n = G.number_of_nodes()
   eps = getConstObj().epsilon
   q = EffRes_SampleCount(n, eps)
@@ -115,24 +125,35 @@ def EffRes_SDDSolver_Base(G, SDDSolver, q_max = 0, forceQ = False):
   weights = np.array(weights)
   weights = weights / np.sum(weights)
 
-  samples = np.random.choice(range(len(weights)), q, p=weights) 
-
   H = nx.Graph()
   H.add_nodes_from(G.nodes)
 
-  # TODO optimize by taking counts on samples
-  count = 0
   edges = list(G.edges(data=True))
-  for sample in samples:
-    edge = edges[sample]
-    w = edge[2]["weight"]/(q * weights[sample])
 
-    if H.has_edge(edge[0], edge[1]):
-      H[edge[0]][edge[1]]["weight"] += w
-    else:
-      H.add_edge(edge[0], edge[1], weight=w)
-      count += 1
-    if forceQ and count >= q_max:
+  num_samples = 0
+
+  while H.number_of_edges() < num_edges:
+    samples = np.random.choice(range(len(weights)), q, p=weights) 
+
+    for sample in samples:
+      edge = edges[sample]
+      w = edge[2]["weight"]/weights[sample]
+
+      if H.has_edge(edge[0], edge[1]):
+        H[edge[0]][edge[1]]["weight"] += w
+      else:
+        H.add_edge(edge[0], edge[1], weight=w)
+      
+      num_samples += 1
+      
+      if forceEdges and H.number_of_edges() >= num_edges:
+        break
+
+    if not forceEdges:
       break
 
+  edges = list(H.edges(data=True))
+  for edge in edges:
+    H[edge[0]][edge[1]]["weight"] /= num_samples
+    
   return H

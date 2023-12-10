@@ -33,7 +33,17 @@ from constants import getConstObj
 from methods_map import getMethodsMap
 
 
-import exp_fixed_edgeRatio
-import exp_fixed_condNum
-import exp_fixed_error
-import exp_fixed_runtime
+
+"""
+compare no preconditioner to preconditioner for SDD
+implement low stretch spanning tree for this
+
+plots of sparsification for different graphs and different edge ratio
+
+
+preferential attachment graph
+road networks
+mesh graph (surface)
+social network
+
+"""
