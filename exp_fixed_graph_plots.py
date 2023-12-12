@@ -21,6 +21,10 @@ names = ["ST", "F_RQS", "F_MM", "F_TR", "F_ER", "F_ERI"]
 
 graphs = {}
 
+G = nx.barbell_graph(20, 5)
+set_random_weights(G)
+graphs["barbel"] = G
+
 G = nx.connected_caveman_graph(10, 30)
 set_random_weights(G)
 graphs["caveman"] = G

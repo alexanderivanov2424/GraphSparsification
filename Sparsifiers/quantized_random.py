@@ -18,14 +18,14 @@ def randQuant_Sparsify_Fixed(G):
   n = G.number_of_nodes()
   A_ = np.zeros((n,n))
   r = eps / np.sqrt(n)
-
-  norm = num_edges * (np.sum(A[A<r]) + len(A > r)) / 2
+  
+  norm = num_edges * (np.sum(np.abs(A[A<r])) + len(A > r))
 
   for i in range(n):
     for j in range(n):
       if A[i,j] > r:
         A_[i,j] = A[i,j]
-      elif np.random.rand() < np.abs(A[i,j]) * norm:
+      elif np.random.rand() < np.abs(A[i,j]) / norm:
         A_[i,j] = np.sign(A[i,j]) * r
   H = nx.from_numpy_matrix(A_)
   return H

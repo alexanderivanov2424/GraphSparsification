@@ -10,6 +10,8 @@ import logging
 from utils import save, load, exists
 from evaluators import *
 
+from constants import getConstObj
+
 
 def fix_keys(experiment_data):
   for name in experiment_data:
@@ -135,6 +137,48 @@ def generic_comparison(eval_func, exp_name, names, methods, graph_generator, siz
       try:
         val = eval_func(G, H)
         experiment_data[names[i]][n] = val
+
+        save(experiment_data, exp_name)
+      except Exception as e:
+        logging.error(traceback.format_exc())
+
+def spectral_error_comparison_ratio(exp_name, names, methods, graph_generator, edgeRatios):
+  generic_comparison_ratio(average_error_spectral, exp_name, names, methods, graph_generator, edgeRatios)
+
+def laplacian_error_comparison_ratio(exp_name, names, methods, graph_generator, edgeRatios):
+  generic_comparison_ratio(laplacian_L2, exp_name, names, methods, graph_generator, edgeRatios)
+
+def generic_comparison_ratio(eval_func, exp_name, names, methods, graph_generator, edgeRatios):
+  experiment_data = {} # { method -> { x -> y } }
+  
+  if exists(exp_name):
+    experiment_data = load(exp_name)
+    fix_keys(experiment_data)
+  
+  for name in names:
+    if not name in experiment_data:
+      experiment_data[name] = {}
+
+  print(exp_name)
+  TOTAL_RUNS = len(edgeRatios) * len(methods)
+  RUN_COUNT = 0
+
+  for ratio in edgeRatios:
+    G = graph_generator()
+    getConstObj().edgeRatio = ratio
+    
+    for i, method in enumerate(methods):
+      RUN_COUNT+=1
+      print(f"{RUN_COUNT}/{TOTAL_RUNS}  {names[i]}" + " "*10, end="\r")
+
+      if ratio in experiment_data.get(names[i], {}):
+        continue
+      H = method(G)
+      if not nx.is_connected(H):
+        connect_graph(H)
+      try:
+        val = eval_func(G, H)
+        experiment_data[names[i]][ratio] = val
 
         save(experiment_data, exp_name)
       except Exception as e:
