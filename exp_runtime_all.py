@@ -16,7 +16,7 @@ from methods_map import getMethodsMap
 
 methodsMapObj = getMethodsMap()
 
-names = ["ST", "RQS", "MM", "TR", "EFI", "EF"]
+names = ["ST", "RQS", "MM", "TR", "ERI", "ER"]
 methods = [methodsMapObj.getMethod(name) for name in names]
 
 graph_gen_size = get_random_weighted_graph
@@ -64,7 +64,7 @@ plt.savefig(f"./plots/{EXP_NAME}.png")
 plt.cla()
 
 
-
+exit()
 
 
 names = ["ST", "RQS", "MM", "EFI"]

@@ -6,7 +6,7 @@ from constants import getConstObj
 """
 A Simple, Combinatorial Algorithm for Solving SDD Systems in Nearly-Linear Time
 Jonathan A. Kelner, Lorenzo Orecchia, Aaron Sidford
-https://arxiv.org/pdf/1301.6628.pdf
+https://arxiv.org/abs/1301.6628
 
 
 """

@@ -6,7 +6,7 @@ from sksparse.cholmod import cholesky
 """
 Approximate Gaussian Elimination for Laplacians – Fast, Sparse, and Simple
 Rasmus Kyng, Sushant Sachdeva
-https://arxiv.org/pdf/1605.02353.pdf
+https://arxiv.org/abs/1605.02353
 
 existing implementation can be found here:
 

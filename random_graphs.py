@@ -29,6 +29,11 @@ def set_random_weights(G, seed = 0):
     G[edge[0]][edge[1]]['weight'] = np.random.rand()
   return G
 
+def set_uniform_weights(G, weight):
+  for edge in G.edges:
+    G[edge[0]][edge[1]]['weight'] = weight
+  return G
+
 
 def connect_graph(G):
   comps = list(nx.connected_components(G))

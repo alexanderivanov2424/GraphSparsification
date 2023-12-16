@@ -9,12 +9,13 @@ from constants import getConstObj
 """
 A Note on Preconditioning by Low-Stretch Spanning Trees
 Daniel A. Spielman, Jae Oh Woo
-https://arxiv.org/pdf/0903.2816.pdf
+https://arxiv.org/abs/0903.2816
 
 """
 
 class SpanTree_Solver:
   def __init__(self, G, eps):
+    # TODO this is wrong. A minimum spanning tree is not equivalent to a low stretch spanning tree
     T = nx.minimum_spanning_tree(G, weight='weight', algorithm='kruskal')
     self.L = csc_matrix(nx.laplacian_matrix(G).toarray())
     self.L_T = csc_matrix(nx.laplacian_matrix(T).toarray())

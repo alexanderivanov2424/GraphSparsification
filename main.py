@@ -32,10 +32,21 @@ from experiments import spectral_error_comparison, spectral_error_ratio_comparis
 from constants import getConstObj
 from methods_map import getMethodsMap
 
+import matplotlib
+import osmnx as ox
 
-import exp_fixed_edgeRatio
-import exp_fixed_condNum
-import exp_fixed_error
-import exp_fixed_graph_plots
-import exp_fixed_spar_error
-import exp_fixed_runtime
+
+
+places = []
+#places.append("Piedmont, California, USA")
+#places.append("Manhattan, New York, New York, USA")
+#places.append("Miami, FL, USA")
+places.append("Berkeley, California, USA")
+
+for place in places:
+  G = ox.graph_from_place(place, network_type="drive", simplify=True).to_undirected()
+  print(G.number_of_nodes())
+  print(G.number_of_edges())
+  nx.draw(G, node_size=3)
+  plt.show()
+
